@@ -64,7 +64,7 @@ class _GameToastState extends State<GameToast>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, -1),
+      begin: const Offset(0.0, -1.0),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
@@ -97,7 +97,7 @@ class _GameToastState extends State<GameToast>
         child: Material(
           color: Colors.transparent,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             decoration: BoxDecoration(
               color: Colors.black87,
               borderRadius: BorderRadius.circular(25),

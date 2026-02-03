@@ -11,7 +11,6 @@ import '../world/pathfinding.dart';
 class CustomerComponent extends PositionComponent with CollisionCallbacks {
   final Customer customer;
   final GameController gameController;
-  double _animationTime = 0;
   List<Vector2> _path = [];
   int _currentPathIndex = 0;
 
@@ -35,8 +34,6 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
   @override
   void update(double dt) {
     super.update(dt);
-    
-    _animationTime += dt;
     
     // Update customer position from model
     position = customer.position;
