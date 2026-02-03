@@ -65,7 +65,7 @@ class _DoorComponent extends PositionComponent {
           width: size.x,
           height: size.y,
         ),
-        Radius.circular(5),
+        const Radius.circular(5),
       ),
       doorPaint,
     );

@@ -74,7 +74,7 @@ class WorkStationComponent extends PositionComponent with CollisionCallbacks {
     final textPainter = TextPainter(
       text: TextSpan(
         text: emoji,
-        style: TextStyle(fontSize: 32),
+        style: const TextStyle(fontSize: 32),
       ),
       textDirection: TextDirection.ltr,
     );

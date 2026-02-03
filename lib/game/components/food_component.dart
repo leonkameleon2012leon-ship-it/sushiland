@@ -53,7 +53,7 @@ class FoodComponent extends PositionComponent {
       final starPainter = TextPainter(
         text: TextSpan(
           text: '⭐' * _getQualityStars(),
-          style: TextStyle(fontSize: 10),
+          style: const TextStyle(fontSize: 10),
         ),
         textDirection: TextDirection.ltr,
       );

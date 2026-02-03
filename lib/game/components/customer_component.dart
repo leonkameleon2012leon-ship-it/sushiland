@@ -215,7 +215,7 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
     final textPainter = TextPainter(
       text: TextSpan(
         text: '🍣',
-        style: TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 14),
       ),
       textDirection: TextDirection.ltr,
     );

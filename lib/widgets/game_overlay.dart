@@ -122,7 +122,7 @@ class _GameToastState extends State<GameToast>
                 Flexible(
                   child: Text(
                     widget.message,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
