@@ -104,7 +104,7 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
     final textPainter = TextPainter(
       text: TextSpan(
         text: '👨‍🍳',
-        style: TextStyle(fontSize: 24),
+        style: const TextStyle(fontSize: 24),
       ),
       textDirection: TextDirection.ltr,
     );
@@ -122,7 +122,7 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
       final invPainter = TextPainter(
         text: TextSpan(
           text: '📦${player.inventory.length}',
-          style: TextStyle(fontSize: 14, backgroundColor: Colors.black45),
+          style: const TextStyle(fontSize: 14, backgroundColor: Colors.black45),
         ),
         textDirection: TextDirection.ltr,
       );
@@ -138,7 +138,7 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
       final sushiPainter = TextPainter(
         text: TextSpan(
           text: '🍣',
-          style: TextStyle(fontSize: 20),
+          style: const TextStyle(fontSize: 20),
         ),
         textDirection: TextDirection.ltr,
       );

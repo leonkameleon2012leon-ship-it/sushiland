@@ -116,9 +116,9 @@ class _GameToastState extends State<GameToast>
               children: [
                 Text(
                   widget.emoji,
-                  style: TextStyle(fontSize: 24),
+                  style: const TextStyle(fontSize: 24),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Flexible(
                   child: Text(
                     widget.message,

@@ -92,7 +92,7 @@ class WorkStationComponent extends PositionComponent with CollisionCallbacks {
       final promptPainter = TextPainter(
         text: TextSpan(
           text: 'Press A',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
             color: Colors.white,
             backgroundColor: Colors.black87,

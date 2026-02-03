@@ -35,7 +35,7 @@ class FoodComponent extends PositionComponent {
     final textPainter = TextPainter(
       text: TextSpan(
         text: _getSushiEmoji(),
-        style: TextStyle(fontSize: 24),
+        style: const TextStyle(fontSize: 24),
       ),
       textDirection: TextDirection.ltr,
     );

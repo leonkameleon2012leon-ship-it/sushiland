@@ -74,7 +74,7 @@ class _DoorComponent extends PositionComponent {
     final textPainter = TextPainter(
       text: TextSpan(
         text: '🚪',
-        style: TextStyle(fontSize: 28),
+        style: const TextStyle(fontSize: 28),
       ),
       textDirection: TextDirection.ltr,
     );
