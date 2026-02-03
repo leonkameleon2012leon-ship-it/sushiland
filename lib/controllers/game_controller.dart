@@ -141,6 +141,9 @@ class GameController extends ChangeNotifier {
         player.addIngredient(Ingredient(type: type));
       }
     }
+    
+    // Notify for particle effect
+    notifyListeners();
   }
 
   void _prepareSushi(WorkStation station) {

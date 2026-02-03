@@ -6,6 +6,7 @@ import 'components/player_component.dart';
 import 'components/customer_component.dart';
 import 'components/workstation_component.dart';
 import 'components/table_component.dart';
+import 'components/particle_effects.dart';
 import 'world/game_world.dart';
 
 /// Main Flame game class that manages the game world, camera, and components
@@ -142,4 +143,25 @@ class SushilandGame extends FlameGame with HasCollisionDetection {
   void triggerInteraction() {
     playerComponent.interact();
   }
+
+  /// Spawn particle effect at position
+  void spawnParticleEffect(String effectType, Vector2 position, {int? value}) {
+    switch (effectType) {
+      case 'sparkle':
+        gameWorld.add(SparkleEffect(position: position));
+        break;
+      case 'starburst':
+        gameWorld.add(StarBurstEffect(position: position));
+        break;
+      case 'money':
+        if (value != null) {
+          gameWorld.add(MoneyFloatEffect(position: position, amount: value));
+        }
+        break;
+      case 'heart':
+        gameWorld.add(HeartEffect(position: position));
+        break;
+    }
+  }
 }
+

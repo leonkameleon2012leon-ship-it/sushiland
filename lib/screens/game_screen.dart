@@ -5,6 +5,7 @@ import '../controllers/game_controller.dart';
 import '../widgets/ui/hud.dart';
 import '../widgets/controls/virtual_joystick.dart';
 import '../widgets/controls/action_buttons.dart';
+import '../widgets/game_overlay.dart';
 import '../game/sushiland_game.dart';
 
 class GameScreen extends StatefulWidget {
@@ -18,12 +19,17 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late SushilandGame _game;
   late GameController _gameController;
+  int _previousCustomerCount = 0;
+  int _previousMoney = 0;
 
   @override
   void initState() {
     super.initState();
     _gameController = context.read<GameController>();
     _game = SushilandGame(gameController: _gameController);
+    
+    _previousCustomerCount = _gameController.customerController.customers.length;
+    _previousMoney = _gameController.restaurant.money;
     
     _animationController = AnimationController(
       vsync: this,
@@ -34,6 +40,33 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   void _gameLoop() {
     _gameController.update(0.016);
+    _checkForNotifications();
+  }
+
+  void _checkForNotifications() {
+    final currentCustomerCount = _gameController.customerController.customers.length;
+    final currentMoney = _gameController.restaurant.money;
+
+    // New customer arrived
+    if (currentCustomerCount > _previousCustomerCount) {
+      GameToast.show(
+        context,
+        message: 'New Customer Arrived!',
+        emoji: '👤',
+      );
+    }
+
+    // Money increased (order completed)
+    if (currentMoney > _previousMoney) {
+      GameToast.show(
+        context,
+        message: 'Order Complete!',
+        emoji: '✨',
+      );
+    }
+
+    _previousCustomerCount = currentCustomerCount;
+    _previousMoney = currentMoney;
   }
 
   @override

@@ -5,12 +5,15 @@ import 'package:vector_math/vector_math_64.dart' hide Colors;
 import '../../models/customer.dart';
 import '../../controllers/game_controller.dart';
 import '../../utils/enums.dart';
+import '../world/pathfinding.dart';
 
 /// Customer component with AI, pathfinding, and animations
 class CustomerComponent extends PositionComponent with CollisionCallbacks {
   final Customer customer;
   final GameController gameController;
   double _animationTime = 0;
+  List<Vector2> _path = [];
+  int _currentPathIndex = 0;
 
   CustomerComponent({
     required this.customer,
@@ -24,7 +27,7 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    add(CircleHitbox(radius: 17.5));
+    add(CircleHitbox(radius: 17.5, isSolid: false)); // Ghost collision
   }
 
   @override
@@ -36,14 +39,45 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
     // Update customer position from model
     position = customer.position;
     
-    // Simple pathfinding to target position
+    // Pathfinding to target position
     if (customer.targetPosition != null) {
-      final direction = customer.targetPosition! - customer.position;
-      if (direction.length > 2) {
-        final normalizedDirection = direction.normalized();
-        customer.position += normalizedDirection * 50 * dt; // 50 pixels/second
+      // If we don't have a path or target changed, calculate new path
+      if (_path.isEmpty || _currentPathIndex >= _path.length) {
+        _calculatePath();
+      }
+
+      // Follow path
+      if (_path.isNotEmpty && _currentPathIndex < _path.length) {
+        final targetWaypoint = _path[_currentPathIndex];
+        final direction = targetWaypoint - customer.position;
+        
+        if (direction.length > 2) {
+          final normalizedDirection = direction.normalized();
+          customer.position += normalizedDirection * 50 * dt; // 50 pixels/second
+        } else {
+          // Reached waypoint, move to next
+          _currentPathIndex++;
+        }
       }
     }
+  }
+
+  void _calculatePath() {
+    if (customer.targetPosition == null) return;
+
+    // Get obstacle positions (work stations and tables)
+    final obstacles = <Vector2>[];
+    for (var station in gameController.restaurant.workStations) {
+      obstacles.add(station.position);
+    }
+    // Don't add tables as obstacles for now to allow customers to reach them
+
+    _path = Pathfinding.findPath(
+      customer.position,
+      customer.targetPosition!,
+      obstacles,
+    );
+    _currentPathIndex = 0;
   }
 
   @override

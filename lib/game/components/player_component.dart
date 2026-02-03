@@ -5,6 +5,7 @@ import 'package:vector_math/vector_math_64.dart' hide Colors;
 import '../../models/player.dart';
 import '../../controllers/game_controller.dart';
 import '../../utils/enums.dart';
+import '../sushiland_game.dart';
 
 /// Player component with smooth movement, animations, and interactions
 class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallbacks {
@@ -42,8 +43,38 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
       final normalizedDirection = _movementDirection.normalized();
       final movement = normalizedDirection * player.speed * dt;
       
-      position += movement;
-      player.position = position;
+      // Calculate new position
+      final newPosition = position + movement;
+      
+      // Check collision with work stations
+      bool collides = false;
+      for (var station in gameController.restaurant.workStations) {
+        final distance = (newPosition - station.position).length;
+        if (distance < 40) { // Player radius (20) + station half-width (30) = 50, use 40 for smoothness
+          collides = true;
+          break;
+        }
+      }
+      
+      // Check collision with tables
+      for (var table in gameController.restaurant.tables) {
+        final distance = (newPosition - table.position).length;
+        if (distance < 45) { // Player radius (20) + table radius (25)
+          collides = true;
+          break;
+        }
+      }
+      
+      // Only update position if no collision
+      if (!collides) {
+        position = newPosition;
+        
+        // Constrain to world bounds
+        position.x = position.x.clamp(20.0, 780.0);
+        position.y = position.y.clamp(20.0, 580.0);
+        
+        player.position = position;
+      }
       
       // Update animation state based on direction
       _updateAnimationState(normalizedDirection);
@@ -158,6 +189,12 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
   }
 
   void interact() {
+    // Spawn sparkle effect at player position
+    if (gameRef.parent is SushilandGame) {
+      final game = gameRef.parent as SushilandGame;
+      game.spawnParticleEffect('sparkle', position);
+    }
+    
     gameController.interact();
   }
 
