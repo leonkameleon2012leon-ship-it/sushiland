@@ -36,7 +36,7 @@ class CustomerController {
     
     Customer newCustomer = Customer(
       id: 'customer_' + _customerIdCounter.toString(),
-      position: Vector2(50, 300),
+      position: Vector2(400, 50), // Entrance position from problem statement
       order: SushiOrder(
         id: 'order_' + _customerIdCounter.toString(),
         sushiType: randomType,

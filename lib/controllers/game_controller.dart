@@ -33,7 +33,7 @@ class GameController extends ChangeNotifier {
   }
 
   void _initializeGame() {
-    player = Player(position: Vector2(200, 200));
+    player = Player(position: Vector2(400, 300)); // Start at center
     restaurant = Restaurant();
     resourceController = ResourceController();
     customerController = CustomerController(restaurant: restaurant);
@@ -42,31 +42,41 @@ class GameController extends ChangeNotifier {
   }
 
   void _setupInitialStations() {
-    restaurant.addWorkStation(WorkStation(
-      id: 'prep_station_1',
-      type: StationType.preparation,
-      position: Vector2(100, 100),
-    ));
-
+    // Positions from problem statement
     restaurant.addWorkStation(WorkStation(
       id: 'storage_1',
       type: StationType.storage,
-      position: Vector2(300, 100),
+      position: Vector2(100, 150),
+    ));
+
+    restaurant.addWorkStation(WorkStation(
+      id: 'prep_station_1',
+      type: StationType.preparation,
+      position: Vector2(300, 150),
     ));
 
     restaurant.addWorkStation(WorkStation(
       id: 'counter_1',
       type: StationType.counter,
-      position: Vector2(200, 300),
+      position: Vector2(100, 500),
     ));
 
+    // Tables at specified positions
     restaurant.addTable(RestaurantTable(
       id: 0,
-      position: Vector2(150, 250),
+      position: Vector2(200, 250),
     ));
     restaurant.addTable(RestaurantTable(
       id: 1,
-      position: Vector2(250, 250),
+      position: Vector2(500, 250),
+    ));
+    restaurant.addTable(RestaurantTable(
+      id: 2,
+      position: Vector2(200, 400),
+    ));
+    restaurant.addTable(RestaurantTable(
+      id: 3,
+      position: Vector2(500, 400),
     ));
   }
 
