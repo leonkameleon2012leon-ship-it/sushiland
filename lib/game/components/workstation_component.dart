@@ -11,6 +11,9 @@ class WorkStationComponent extends PositionComponent with CollisionCallbacks {
   final GameController gameController;
   bool isHighlighted = false;
 
+  // Interaction constants
+  static const double highlightDistance = 80.0; // Distance for player proximity
+
   WorkStationComponent({
     required this.workStation,
     required this.gameController,
@@ -118,6 +121,6 @@ class WorkStationComponent extends PositionComponent with CollisionCallbacks {
     // Check if player is nearby for highlighting
     final playerPos = gameController.player.position;
     final distance = (position - playerPos).length;
-    isHighlighted = distance < 80.0;
+    isHighlighted = distance < highlightDistance;
   }
 }

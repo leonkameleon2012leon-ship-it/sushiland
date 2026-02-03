@@ -17,6 +17,16 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
   PlayerAnimationState _currentState = PlayerAnimationState.idleDown;
   double _animationTime = 0;
 
+  // Collision thresholds
+  static const double stationCollisionThreshold = 40.0;
+  static const double tableCollisionThreshold = 45.0;
+  
+  // World boundaries (20px padding from edges)
+  static const double minX = 20.0;
+  static const double maxX = 780.0;
+  static const double minY = 20.0;
+  static const double maxY = 580.0;
+
   PlayerComponent({
     required this.player,
     required this.gameController,
@@ -53,7 +63,7 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
       bool collides = false;
       for (var station in gameController.restaurant.workStations) {
         final distance = (newPosition - station.position).length;
-        if (distance < 40) {
+        if (distance < stationCollisionThreshold) {
           collides = true;
           break;
         }
@@ -64,7 +74,7 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
       // Using correct threshold 45px (20 + 25) as tables need precise collision
       for (var table in gameController.restaurant.tables) {
         final distance = (newPosition - table.position).length;
-        if (distance < 45) {
+        if (distance < tableCollisionThreshold) {
           collides = true;
           break;
         }
@@ -75,8 +85,8 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
         position = newPosition;
         
         // Constrain to world bounds
-        position.x = position.x.clamp(20.0, 780.0);
-        position.y = position.y.clamp(20.0, 580.0);
+        position.x = position.x.clamp(minX, maxX);
+        position.y = position.y.clamp(minY, maxY);
         
         player.position = position;
       }

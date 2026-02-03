@@ -14,6 +14,10 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
   List<Vector2> _path = [];
   int _currentPathIndex = 0;
 
+  // Component constants
+  static const double hitboxRadius = 17.5; // Half of component size (35/2)
+  static const double movementSpeed = 50.0; // Pixels per second
+
   CustomerComponent({
     required this.customer,
     required this.gameController,
@@ -29,7 +33,7 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
     // Ghost collision: allows customers to pass through other entities
     // while still detecting overlaps. This prevents customers from blocking each other.
     // Radius: 17.5px (half of component size 35/2) for proper hitbox coverage
-    add(CircleHitbox(radius: 17.5, isSolid: false));
+    add(CircleHitbox(radius: hitboxRadius, isSolid: false));
   }
 
   @override
@@ -53,7 +57,7 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
         
         if (direction.length > 2) {
           final normalizedDirection = direction.normalized();
-          customer.position += normalizedDirection * 50 * dt; // 50 pixels/second
+          customer.position += normalizedDirection * movementSpeed * dt;
         } else {
           // Reached waypoint, move to next
           _currentPathIndex++;
