@@ -1,5 +1,5 @@
 ﻿name: sushiland
-description: A sushi restaurant management game
+description: A plant care mobile application
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,11 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flame: ^1.16.0
-  flame_audio: ^2.1.6
   provider: ^6.1.1
   shared_preferences: ^2.2.2
-  vector_math: ^2.1.4
+  permission_handler: ^11.0.1
+  geolocator: ^10.1.0
 
 dev_dependencies:
   flutter_test:
@@ -22,10 +21,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/
-    - assets/images/characters/
-    - assets/images/furniture/
-    - assets/images/food/
-    - assets/images/tiles/
-    - assets/audio/

@@ -1,27 +1,21 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'controllers/game_controller.dart';
-import 'screens/main_menu_screen.dart';
+import 'constants/app_theme.dart';
+import 'screens/onboarding/welcome_screen.dart';
 
 void main() {
-  runApp(SushilandApp());
+  runApp(const PlantCareApp());
 }
 
-class SushilandApp extends StatelessWidget {
+class PlantCareApp extends StatelessWidget {
+  const PlantCareApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => GameController(),
-      child: MaterialApp(
-        title: 'Sushiland - Restaurant Game',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.orange,
-          fontFamily: 'Roboto',
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: MainMenuScreen(),
-      ),
+    return MaterialApp(
+      title: 'Twoje Rośliny',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.theme,
+      home: const WelcomeScreen(),
     );
   }
 }
