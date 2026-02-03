@@ -54,8 +54,8 @@ class _GameToastState extends State<GameToast>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Duration(milliseconds: 300),
-      reverseDuration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
+      reverseDuration: const Duration(milliseconds: 200),
       vsync: this,
     );
 

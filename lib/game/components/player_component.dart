@@ -47,10 +47,12 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
       final newPosition = position + movement;
       
       // Check collision with work stations
+      // Using 40px threshold instead of 50px (20 + 30) for smoother movement around stations
+      // This allows the player to get closer to stations before collision occurs
       bool collides = false;
       for (var station in gameController.restaurant.workStations) {
         final distance = (newPosition - station.position).length;
-        if (distance < 40) { // Player radius (20) + station half-width (30) = 50, use 40 for smoothness
+        if (distance < 40) {
           collides = true;
           break;
         }

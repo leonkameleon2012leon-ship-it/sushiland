@@ -25,8 +25,8 @@ class Pathfinding {
     // Create grid with obstacles
     final grid = _createGrid(obstacles);
 
-    // A* pathfinding
-    final openSet = PriorityQueue<_Node>((a, b) => a.f.compareTo(b.f));
+    // A* pathfinding - using HeapPriorityQueue for O(log n) insertion
+    final openSet = HeapPriorityQueue<_Node>((a, b) => a.f.compareTo(b.f));
     final closedSet = <String>{};
     final cameFrom = <String, _Node>{};
 
@@ -149,22 +149,4 @@ class _Node {
   double get f => g + h;
 
   _Node(this.tile, this.g, this.h);
-}
-
-/// Simple priority queue
-class PriorityQueue<T> {
-  final List<T> _items = [];
-  final int Function(T, T) _comparator;
-
-  PriorityQueue(this._comparator);
-
-  void add(T item) {
-    _items.add(item);
-    _items.sort(_comparator);
-  }
-
-  T removeFirst() => _items.removeAt(0);
-
-  bool get isNotEmpty => _items.isNotEmpty;
-  bool get isEmpty => _items.isEmpty;
 }

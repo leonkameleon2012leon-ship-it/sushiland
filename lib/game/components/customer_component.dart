@@ -27,7 +27,9 @@ class CustomerComponent extends PositionComponent with CollisionCallbacks {
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    add(CircleHitbox(radius: 17.5, isSolid: false)); // Ghost collision
+    // Ghost collision: allows customers to pass through other entities
+    // while still detecting overlaps. This prevents customers from blocking each other.
+    add(CircleHitbox(radius: 17.5, isSolid: false));
   }
 
   @override
