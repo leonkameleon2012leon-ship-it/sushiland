@@ -55,7 +55,7 @@ class TableComponent extends PositionComponent with CollisionCallbacks {
     final textPainter = TextPainter(
       text: TextSpan(
         text: 'T${table.id + 1}',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 14,
           color: Colors.white,
           fontWeight: FontWeight.bold,

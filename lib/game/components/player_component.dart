@@ -193,8 +193,8 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
 
   void interact() {
     // Spawn sparkle effect at player position
-    if (gameRef.parent is SushilandGame) {
-      final game = gameRef.parent as SushilandGame;
+    if (gameRef is SushilandGame) {
+      final game = gameRef as SushilandGame;
       game.spawnParticleEffect('sparkle', position);
     }
     
