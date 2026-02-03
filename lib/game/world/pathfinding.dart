@@ -8,6 +8,10 @@ class Pathfinding {
   static const int gridHeight = 19; // 600 / 32
 
   /// Find path from start to end using A* algorithm
+  /// 
+  /// Time Complexity: O(b^d) where b is branching factor (4) and d is path depth
+  /// Space Complexity: O(b^d) for storing open and closed sets
+  /// Insertion into priority queue: O(log n) using HeapPriorityQueue
   static List<Vector2> findPath(
     Vector2 start,
     Vector2 end,

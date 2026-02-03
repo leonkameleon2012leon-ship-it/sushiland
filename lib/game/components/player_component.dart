@@ -60,9 +60,11 @@ class PlayerComponent extends PositionComponent with HasGameRef, CollisionCallba
       }
       
       // Check collision with tables
+      // Player radius: 20px, Table radius: 25px
+      // Using correct threshold 45px (20 + 25) as tables need precise collision
       for (var table in gameController.restaurant.tables) {
         final distance = (newPosition - table.position).length;
-        if (distance < 45) { // Player radius (20) + table radius (25)
+        if (distance < 45) {
           collides = true;
           break;
         }
