@@ -3,9 +3,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 import '../../constants/app_theme.dart';
 import '../../services/plant_storage_service.dart';
+import '../../services/weather_service.dart';
+import '../../services/smart_watering_service.dart';
 import '../../utils/plant_helpers.dart';
 import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/welcome_screen.dart';
+import '../plant/plant_scan_screen.dart';
 import 'plant_info_screen.dart';
 
 class PlantStatus {
@@ -85,6 +88,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   late List<PlantStatus> _plants;
   String _userName = '';
   late AnimationController _greetingAnimationController;
+  WeatherData? _weatherData;
+  bool _isLoadingWeather = true;
   
   @override
   void initState() {
@@ -106,6 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     
     _greetingAnimationController.forward();
     _loadUserName();
+    _loadWeather();
     
     // Save plants whenever they're initialized or modified
     if (_plants.isNotEmpty) {
@@ -125,6 +131,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     setState(() {
       _userName = name;
     });
+  }
+  
+  Future<void> _loadWeather() async {
+    try {
+      final weather = await WeatherService.getCurrentWeather();
+      setState(() {
+        _weatherData = weather;
+        _isLoadingWeather = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingWeather = false;
+      });
+    }
   }
   
   Future<void> _savePlants() async {
@@ -238,6 +258,25 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           if (!exists) {
             _plants.add(PlantStatus(plant: plant));
           }
+        }
+      });
+      _savePlants();
+    }
+  }
+  
+  Future<void> _scanPlant() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const PlantScanScreen(),
+      ),
+    );
+    
+    // If plant was added, update the list
+    if (result != null && result is Plant) {
+      setState(() {
+        final exists = _plants.any((p) => p.plant.name == result.name);
+        if (!exists) {
+          _plants.add(PlantStatus(plant: result));
         }
       });
       _savePlants();
@@ -433,6 +472,78 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ),
               ),
               
+              // Weather widget
+              if (_weatherData != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  child: FadeTransition(
+                    opacity: _greetingAnimationController,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryGreen,
+                            AppTheme.lightGreen,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryGreen.withOpacity(0.3),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            _weatherData!.emoji,
+                            style: const TextStyle(fontSize: 40),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      _weatherData!.temperatureString,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Wilgotność: ${_weatherData!.humidityString}',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white.withOpacity(0.9),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _weatherData!.message,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white.withOpacity(0.95),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              
               Expanded(
                 child: _plants.isEmpty
                     ? _buildEmptyState()
@@ -466,28 +577,49 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    ElevatedButton(
-                      onPressed: _addPlant,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add),
-                          SizedBox(width: 8),
-                          Text(
-                            'Dodaj roślinę',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _addPlant,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(0, 56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            icon: const Icon(Icons.add),
+                            label: const Text(
+                              'Dodaj ręcznie',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: _scanPlant,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(0, 56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              backgroundColor: AppTheme.darkGreen,
+                            ),
+                            icon: const Icon(Icons.camera_alt),
+                            label: const Text(
+                              'Skanuj',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
