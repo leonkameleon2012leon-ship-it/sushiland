@@ -4,6 +4,7 @@ import 'dart:math';
 import '../../constants/app_theme.dart';
 import '../../services/plant_storage_service.dart';
 import '../onboarding/plant_selection_screen.dart';
+import '../onboarding/welcome_screen.dart';
 
 class PlantStatus {
   final Plant plant;
@@ -135,6 +136,54 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
   
+  void _deletePlant(int index) {
+    final plantName = _plants[index].plant.name;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Usuń roślinę'),
+          content: Text('Czy na pewno chcesz usunąć $plantName?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Anuluj'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _plants.removeAt(index);
+                });
+                _savePlants();
+                Navigator.of(context).pop();
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('$plantName została usunięta'),
+                    backgroundColor: AppTheme.darkGreen,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('Usuń'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
   Future<void> _addPlant() async {
     final result = await Navigator.of(context).push(
       PageRouteBuilder(
@@ -186,22 +235,27 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundGreen,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              AppTheme.lightGreen.withOpacity(0.3),
-              AppTheme.backgroundGreen,
-            ],
+    return WillPopScope(
+      onWillPop: () async {
+        // Prevent going back to onboarding
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: AppTheme.backgroundGreen,
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                AppTheme.lightGreen.withOpacity(0.3),
+                AppTheme.backgroundGreen,
+              ],
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
+          child: SafeArea(
+            child: Column(
+              children: [
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: FadeTransition(
@@ -233,6 +287,71 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                                 fontSize: 24,
                                 color: AppTheme.textDark,
                               ),
+                            ),
+                            const Spacer(),
+                            PopupMenuButton<String>(
+                              icon: const Icon(
+                                Icons.settings,
+                                color: AppTheme.textDark,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onSelected: (value) async {
+                                if (value == 'reset') {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        title: const Text('Resetuj aplikację'),
+                                        content: const Text(
+                                          'Czy na pewno chcesz zresetować aplikację? '
+                                          'Wszystkie dane zostaną usunięte i będziesz musiał '
+                                          'ponownie przejść przez onboarding.',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(false),
+                                            child: const Text('Anuluj'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () => Navigator.of(context).pop(true),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                            ),
+                                            child: const Text('Resetuj'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                  
+                                  if (confirm == true && mounted) {
+                                    await PlantStorageService.clearAllData();
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder: (context) => const WelcomeScreen(),
+                                      ),
+                                      (route) => false,
+                                    );
+                                  }
+                                }
+                              },
+                              itemBuilder: (BuildContext context) => [
+                                const PopupMenuItem<String>(
+                                  value: 'reset',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.refresh, color: Colors.red, size: 20),
+                                      SizedBox(width: 8),
+                                      Text('Resetuj aplikację'),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -315,6 +434,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
           ),
         ),
       ),
+    ),
     );
   }
   
@@ -407,6 +527,33 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                     ),
                   ],
                 ),
+              ),
+              
+              PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: AppTheme.textDark,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                onSelected: (value) {
+                  if (value == 'delete') {
+                    _deletePlant(index);
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red, size: 20),
+                        SizedBox(width: 8),
+                        Text('Usuń'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
