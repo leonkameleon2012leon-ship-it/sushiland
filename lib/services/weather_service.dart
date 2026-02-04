@@ -23,6 +23,7 @@ class WeatherService {
     // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
 
+    // Return demo weather data
     return WeatherData(
       temperature: 22.0,
       humidity: 55,
@@ -75,17 +76,14 @@ class WeatherService {
       // Fallback to demo data on error
     }
 
-    return _getDemoWeather();
-    */
-  }
-
-  static WeatherData _getDemoWeather() {
+    // Fallback to demo data
     return WeatherData(
       temperature: 22.0,
       humidity: 55,
       description: 'Pochmurno',
       icon: '🌤️',
     );
+    */
   }
 
   static String _getWeatherIcon(String weatherMain) {

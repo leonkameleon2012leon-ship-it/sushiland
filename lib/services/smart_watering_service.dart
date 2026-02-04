@@ -45,12 +45,19 @@ class SmartWateringService {
       return 'Suche powietrze - zwiększ podlewanie 🏜️';
     } else if (weather.humidity > 70) {
       return 'Wysoka wilgotność - podlewaj rzadziej 💧';
-    } else if (weather.temperature >= 20 && weather.temperature <= 25 && 
-               weather.humidity >= 40 && weather.humidity <= 60) {
+    } else if (_isIdealConditions(weather)) {
       return 'Idealne warunki dla roślin! 🌱';
     } else {
       return 'Dobre warunki dla roślin 🌿';
     }
+  }
+
+  /// Checks if conditions are ideal for plants
+  static bool _isIdealConditions(WeatherData weather) {
+    return weather.temperature >= 20 && 
+           weather.temperature <= 25 && 
+           weather.humidity >= 40 && 
+           weather.humidity <= 60;
   }
 
   /// Returns weather emoji icon based on conditions

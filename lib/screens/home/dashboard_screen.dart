@@ -30,7 +30,22 @@ class PlantStatus {
     return difference.inDays;
   }
   
+  /// Calculate days until watering with weather adjustment
+  int daysUntilWateringWithWeather(WeatherData? weather) {
+    if (weather == null) return daysUntilWatering;
+    
+    final adjustedDays = SmartWateringService.calculateAdjustedWateringDays(plant, weather);
+    final nextWateringDate = lastWatered.add(Duration(days: adjustedDays));
+    final difference = nextWateringDate.difference(DateTime.now());
+    return difference.inDays;
+  }
+  
   bool get needsWater => daysUntilWatering <= 0;
+  
+  /// Check if plant needs water with weather consideration
+  bool needsWaterWithWeather(WeatherData? weather) {
+    return daysUntilWateringWithWeather(weather) <= 0;
+  }
   
   String get statusMessage {
     if (needsWater) {
@@ -886,11 +901,15 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'Podlewanie za ${plantStatus.daysUntilWatering} dni',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.textDark.withOpacity(0.6),
+                Expanded(
+                  child: Text(
+                    _weatherData != null 
+                        ? 'Podlewanie za ${plantStatus.daysUntilWateringWithWeather(_weatherData)} dni (dostosowane do pogody)'
+                        : 'Podlewanie za ${plantStatus.daysUntilWatering} dni',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppTheme.textDark.withOpacity(0.6),
+                    ),
                   ),
                 ),
               ],
