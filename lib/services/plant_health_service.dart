@@ -165,7 +165,7 @@ class PlantHealthService {
         symptoms: ['Żółte liście', 'Zwiędnięcie'],
         recommendations: [
           'Ogranicz podlewanie',
-          'Sprawdź drenażw doniczce',
+          'Sprawdź drenaż w doniczce',
           'Poczekaj aż gleba wyschnie',
           'Usuń gnijące korzenie jeśli są widoczne',
         ],
@@ -273,7 +273,7 @@ class PlantHealthService {
         symptoms: ['Żółte liście', 'Zwiędnięcie'],
         recommendations: [
           'Ogranicz podlewanie',
-          'Sprawdź drenażw doniczce',
+          'Sprawdź drenaż w doniczce',
           'Poczekaj aż gleba wyschnie',
         ],
         confidence: 0.71,

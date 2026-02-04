@@ -250,7 +250,7 @@ class _PlantHealthCheckScreenState extends State<PlantHealthCheckScreen>
         const SizedBox(height: 12),
         
         Text(
-          'Sfotografuj liście rośliny, aby przeanalizować\njeśli jest zdrowa',
+          'Sfotografuj liście rośliny, aby przeanalizować,\nczy jest zdrowa',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: AppTheme.textDark.withOpacity(0.7),
           ),
