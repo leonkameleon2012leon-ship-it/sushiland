@@ -77,7 +77,9 @@ class NotificationService {
     
     try {
       // Schedule at 9 AM on the scheduled date
-      final scheduledDateTime = tz.TZ(
+      final tzLocation = tz.getLocation('Europe/Warsaw');
+      final scheduledDateTime = tz.TZDateTime(
+        tzLocation,
         scheduledDate.year,
         scheduledDate.month,
         scheduledDate.day,
