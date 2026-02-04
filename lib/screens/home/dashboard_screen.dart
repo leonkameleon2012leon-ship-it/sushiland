@@ -360,134 +360,136 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             ),
           ),
           child: SafeArea(
-            child: Column(
-              children: [
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: FadeTransition(
-                  opacity: _greetingAnimationController,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, -0.5),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: _greetingAnimationController,
-                      curve: Curves.easeInOut,
-                    )),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-                        
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.spa,
-                              color: AppTheme.primaryGreen,
-                              size: 32,
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Twoje Rośliny',
-                              style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                                fontSize: 24,
-                                color: AppTheme.textDark,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: FadeTransition(
+                    opacity: _greetingAnimationController,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, -0.5),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: _greetingAnimationController,
+                        curve: Curves.easeInOut,
+                      )),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.spa,
+                                color: AppTheme.primaryGreen,
+                                size: 32,
                               ),
-                            ),
-                            const Spacer(),
-                            PopupMenuButton<String>(
-                              icon: const Icon(
-                                Icons.settings,
-                                color: AppTheme.textDark,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              onSelected: (value) async {
-                                if (value == 'reset') {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        title: const Text('Resetuj aplikację'),
-                                        content: const Text(
-                                          'Czy na pewno chcesz zresetować aplikację? '
-                                          'Wszystkie dane zostaną usunięte i będziesz musiał '
-                                          'ponownie przejść przez onboarding.',
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(context).pop(false),
-                                            child: const Text('Anuluj'),
-                                          ),
-                                          ElevatedButton(
-                                            onPressed: () => Navigator.of(context).pop(true),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red,
-                                            ),
-                                            child: const Text('Resetuj'),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                  
-                                  if (confirm == true && mounted) {
-                                    await PlantStorageService.clearAllData();
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                        builder: (context) => const WelcomeScreen(),
-                                      ),
-                                      (route) => false,
-                                    );
-                                  }
-                                }
-                              },
-                              itemBuilder: (BuildContext context) => [
-                                const PopupMenuItem<String>(
-                                  value: 'reset',
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.refresh, color: Colors.red, size: 20),
-                                      SizedBox(width: 8),
-                                      Text('Resetuj aplikację'),
-                                    ],
-                                  ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Twoje Rośliny',
+                                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                                  fontSize: 24,
+                                  color: AppTheme.textDark,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        
-                        const SizedBox(height: 12),
-                        
-                        Text(
-                          '${_getGreeting()}, $_userName! 🌱',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontSize: 18,
-                            color: AppTheme.textDark.withOpacity(0.7),
+                              ),
+                              const Spacer(),
+                              PopupMenuButton<String>(
+                                icon: const Icon(
+                                  Icons.settings,
+                                  color: AppTheme.textDark,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                onSelected: (value) async {
+                                  if (value == 'reset') {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          title: const Text('Resetuj aplikację'),
+                                          content: const Text(
+                                            'Czy na pewno chcesz zresetować aplikację? '
+                                            'Wszystkie dane zostaną usunięte i będziesz musiał '
+                                            'ponownie przejść przez onboarding.',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(false),
+                                              child: const Text('Anuluj'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () => Navigator.of(context).pop(true),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                              ),
+                                              child: const Text('Resetuj'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    
+                                    if (confirm == true && mounted) {
+                                      await PlantStorageService.clearAllData();
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                          builder: (context) => const WelcomeScreen(),
+                                        ),
+                                        (route) => false,
+                                      );
+                                    }
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) => [
+                                  const PopupMenuItem<String>(
+                                    value: 'reset',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.refresh, color: Colors.red, size: 20),
+                                        SizedBox(width: 8),
+                                        Text('Resetuj aplikację'),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          
+                          const SizedBox(height: 12),
+                          
+                          Text(
+                            '${_getGreeting()}, $_userName! 🌱',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontSize: 18,
+                              color: AppTheme.textDark.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              
-              // Weather card
-              if (_weatherData != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: _buildWeatherCard(),
-                ),
-              
-              Expanded(
-                child: _plants.isEmpty
+                
+                // Weather card
+                if (_weatherData != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: _buildWeatherCard(),
+                  ),
+                
+                _plants.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         itemCount: _plants.length,
                         itemBuilder: (context, index) {
@@ -511,71 +513,71 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                           );
                         },
                       ),
-              ),
-              
-              Container(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  children: [
-                    // Health check button
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const PlantHealthScreen(),
+                
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      // Health check button
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const PlantHealthScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.medical_services),
+                            SizedBox(width: 8),
+                            Text(
+                              'Sprawdź zdrowie rośliny',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.medical_services),
-                          SizedBox(width: 8),
-                          Text(
-                            'Sprawdź zdrowie rośliny',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: _addPlant,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 56),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: _addPlant,
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 56),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add),
+                            SizedBox(width: 8),
+                            Text(
+                              'Dodaj roślinę',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add),
-                          SizedBox(width: 8),
-                          Text(
-                            'Dodaj roślinę',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -700,31 +702,34 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   }
   
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.local_florist,
-            size: 80,
-            color: AppTheme.lightGreen,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Nie masz jeszcze roślin',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: AppTheme.textDark,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 60),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.local_florist,
+              size: 80,
+              color: AppTheme.lightGreen,
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Dodaj swoją pierwszą roślinę,\naby zacząć o nią dbać',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: AppTheme.textDark.withOpacity(0.7),
+            const SizedBox(height: 24),
+            Text(
+              'Nie masz jeszcze roślin',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: AppTheme.textDark,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: 12),
+            Text(
+              'Dodaj swoją pierwszą roślinę,\naby zacząć o nią dbać',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppTheme.textDark.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
