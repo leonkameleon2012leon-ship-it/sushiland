@@ -2,30 +2,312 @@ import 'package:flutter/material.dart';
 import '../../constants/app_theme.dart';
 import '../../services/plant_storage_service.dart';
 import '../home/dashboard_screen.dart';
+import 'plant_details_screen.dart';
+
+enum DifficultyLevel { latwy, sredni, trudny }
+
+enum LightRequirement { pelneSlonce, polcien, cien }
+
+enum PlantType { doniczkowa, wiszaca, sukulentowa, kwitnaca }
 
 class Plant {
   final String name;
   final String emoji;
   final String description;
   final int wateringDays;
+  final int age; // w latach
+  final int height; // w cm
+  final DifficultyLevel difficulty;
+  final LightRequirement lightRequirement;
+  final PlantType plantType;
+  final bool toxicToAnimals;
+  final String? notes;
   
   const Plant({
     required this.name,
     required this.emoji,
     required this.description,
     required this.wateringDays,
+    this.age = 1,
+    this.height = 30,
+    this.difficulty = DifficultyLevel.latwy,
+    this.lightRequirement = LightRequirement.polcien,
+    this.plantType = PlantType.doniczkowa,
+    this.toxicToAnimals = false,
+    this.notes,
   });
+  
+  Plant copyWith({
+    String? name,
+    String? emoji,
+    String? description,
+    int? wateringDays,
+    int? age,
+    int? height,
+    DifficultyLevel? difficulty,
+    LightRequirement? lightRequirement,
+    PlantType? plantType,
+    bool? toxicToAnimals,
+    String? notes,
+  }) {
+    return Plant(
+      name: name ?? this.name,
+      emoji: emoji ?? this.emoji,
+      description: description ?? this.description,
+      wateringDays: wateringDays ?? this.wateringDays,
+      age: age ?? this.age,
+      height: height ?? this.height,
+      difficulty: difficulty ?? this.difficulty,
+      lightRequirement: lightRequirement ?? this.lightRequirement,
+      plantType: plantType ?? this.plantType,
+      toxicToAnimals: toxicToAnimals ?? this.toxicToAnimals,
+      notes: notes ?? this.notes,
+    );
+  }
 }
 
 const List<Plant> availablePlants = [
-  Plant(name: 'Monstera', emoji: '🌿', description: 'Łatwa w pielęgnacji', wateringDays: 7),
-  Plant(name: 'Aloes', emoji: '🪴', description: 'Nie wymaga dużo wody', wateringDays: 14),
-  Plant(name: 'Paproć', emoji: '🌱', description: 'Lubi wilgotne środowisko', wateringDays: 5),
-  Plant(name: 'Kaktus', emoji: '🌵', description: 'Bardzo wytrzymały', wateringDays: 21),
-  Plant(name: 'Storczyk', emoji: '🌺', description: 'Piękne kwiaty', wateringDays: 10),
-  Plant(name: 'Filodendron', emoji: '🍃', description: 'Duże zielone liście', wateringDays: 7),
-  Plant(name: 'Sansewieria', emoji: '🌿', description: 'Bardzo odporna', wateringDays: 14),
-  Plant(name: 'Pothos', emoji: '🌱', description: 'Oczyszcza powietrze', wateringDays: 7),
+  Plant(
+    name: 'Monstera',
+    emoji: '🌿',
+    description: 'Łatwa w pielęgnacji',
+    wateringDays: 7,
+    age: 2,
+    height: 45,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: true,
+  ),
+  Plant(
+    name: 'Aloes',
+    emoji: '🪴',
+    description: 'Nie wymaga dużo wody',
+    wateringDays: 14,
+    age: 3,
+    height: 25,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.sukulentowa,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Paproć',
+    emoji: '🌱',
+    description: 'Lubi wilgotne środowisko',
+    wateringDays: 5,
+    age: 1,
+    height: 30,
+    difficulty: DifficultyLevel.sredni,
+    lightRequirement: LightRequirement.cien,
+    plantType: PlantType.wiszaca,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Kaktus',
+    emoji: '🌵',
+    description: 'Bardzo wytrzymały',
+    wateringDays: 21,
+    age: 5,
+    height: 15,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.sukulentowa,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Storczyk',
+    emoji: '🌺',
+    description: 'Piękne kwiaty',
+    wateringDays: 10,
+    age: 2,
+    height: 40,
+    difficulty: DifficultyLevel.trudny,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.kwitnaca,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Filodendron',
+    emoji: '🍃',
+    description: 'Duże zielone liście',
+    wateringDays: 7,
+    age: 3,
+    height: 60,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: true,
+  ),
+  Plant(
+    name: 'Sansewieria',
+    emoji: '🌿',
+    description: 'Bardzo odporna',
+    wateringDays: 14,
+    age: 4,
+    height: 50,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Pothos',
+    emoji: '🌱',
+    description: 'Oczyszcza powietrze',
+    wateringDays: 7,
+    age: 2,
+    height: 35,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.wiszaca,
+    toxicToAnimals: true,
+  ),
+  // Nowe rośliny (12 dodatkowych)
+  Plant(
+    name: 'Palma Areka',
+    emoji: '🌴',
+    description: 'Tropikalna elegancja',
+    wateringDays: 7,
+    age: 3,
+    height: 80,
+    difficulty: DifficultyLevel.sredni,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Begonia',
+    emoji: '🌸',
+    description: 'Kolorowe kwiaty',
+    wateringDays: 5,
+    age: 1,
+    height: 25,
+    difficulty: DifficultyLevel.sredni,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.kwitnaca,
+    toxicToAnimals: true,
+  ),
+  Plant(
+    name: 'Koniczyna szczęścia',
+    emoji: '🍀',
+    description: 'Przynosi szczęście',
+    wateringDays: 7,
+    age: 1,
+    height: 10,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Sukulenty mix',
+    emoji: '🌵',
+    description: 'Różnorodność form',
+    wateringDays: 14,
+    age: 2,
+    height: 12,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.sukulentowa,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Hibiskus',
+    emoji: '🌺',
+    description: 'Egzotyczne kwiaty',
+    wateringDays: 5,
+    age: 2,
+    height: 70,
+    difficulty: DifficultyLevel.trudny,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.kwitnaca,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Zamiokulkas',
+    emoji: '🪴',
+    description: 'Niezniszczalny',
+    wateringDays: 14,
+    age: 3,
+    height: 55,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.cien,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: true,
+  ),
+  Plant(
+    name: 'Skrzydłokwiat',
+    emoji: '🌿',
+    description: 'Białe kwiaty',
+    wateringDays: 7,
+    age: 2,
+    height: 40,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.cien,
+    plantType: PlantType.kwitnaca,
+    toxicToAnimals: true,
+  ),
+  Plant(
+    name: 'Bazylka',
+    emoji: '🌱',
+    description: 'Aromatyczne zioło',
+    wateringDays: 3,
+    age: 1,
+    height: 20,
+    difficulty: DifficultyLevel.sredni,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Tulipan',
+    emoji: '🌷',
+    description: 'Wiosenne kwiaty',
+    wateringDays: 5,
+    age: 1,
+    height: 35,
+    difficulty: DifficultyLevel.sredni,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.kwitnaca,
+    toxicToAnimals: true,
+  ),
+  Plant(
+    name: 'Róża miniaturowa',
+    emoji: '🌹',
+    description: 'Małe piękne róże',
+    wateringDays: 5,
+    age: 2,
+    height: 30,
+    difficulty: DifficultyLevel.trudny,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.kwitnaca,
+    toxicToAnimals: false,
+  ),
+  Plant(
+    name: 'Dracena',
+    emoji: '🍃',
+    description: 'Kolorowe liście',
+    wateringDays: 7,
+    age: 3,
+    height: 65,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: true,
+  ),
+  Plant(
+    name: 'Trawa ozdobna',
+    emoji: '🌾',
+    description: 'Subtelna elegancja',
+    wateringDays: 7,
+    age: 1,
+    height: 40,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.pelneSlonce,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: false,
+  ),
 ];
 
 class PlantSelectionScreen extends StatefulWidget {
@@ -43,6 +325,7 @@ class PlantSelectionScreen extends StatefulWidget {
 class _PlantSelectionScreenState extends State<PlantSelectionScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final Set<int> _selectedPlants = {};
+  final Map<int, Plant> _selectedPlantsData = {}; // Store plant details
   late AnimationController _animationController;
   List<Plant> _filteredPlants = availablePlants;
   
@@ -81,18 +364,53 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
     });
   }
   
-  void _togglePlant(int index) {
-    setState(() {
-      if (_selectedPlants.contains(index)) {
-        _selectedPlants.remove(index);
-      } else {
+  void _togglePlant(int index) async {
+    final plant = availablePlants[index];
+    
+    // Navigate to details screen
+    final result = await Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => PlantDetailsScreen(
+          selectedPlant: plant,
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+          
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+          
+          return SlideTransition(
+            position: offsetAnimation,
+            child: FadeTransition(
+              opacity: animation,
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 600),
+      ),
+    );
+    
+    // If plant details were saved, add to selected plants
+    if (result != null && result is Plant) {
+      setState(() {
+        if (_selectedPlants.contains(index)) {
+          _selectedPlants.remove(index);
+        }
         _selectedPlants.add(index);
-      }
-    });
+        // Update the plant in temporary storage with details
+        _selectedPlantsData[index] = result;
+      });
+    }
   }
   
   void _navigateToHome() async {
-    final selectedPlantsList = _selectedPlants.map((i) => availablePlants[i]).toList();
+    // Get selected plants with their details (or defaults if not customized)
+    final selectedPlantsList = _selectedPlants.map((i) {
+      return _selectedPlantsData[i] ?? availablePlants[i];
+    }).toList();
     
     // If this is during onboarding, mark it as complete
     if (!widget.isAddingPlants) {

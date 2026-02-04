@@ -9,11 +9,14 @@ import '../onboarding/welcome_screen.dart';
 class PlantStatus {
   final Plant plant;
   DateTime lastWatered;
+  List<DateTime> wateringHistory;
   
   PlantStatus({
     required this.plant,
     DateTime? lastWatered,
-  }) : lastWatered = lastWatered ?? DateTime.now();
+    List<DateTime>? wateringHistory,
+  }) : lastWatered = lastWatered ?? DateTime.now(),
+       wateringHistory = wateringHistory ?? [lastWatered ?? DateTime.now()];
   
   int get daysUntilWatering {
     final nextWateringDate = lastWatered.add(Duration(days: plant.wateringDays));
@@ -40,6 +43,14 @@ class PlantStatus {
       description: plant.description,
       wateringDays: plant.wateringDays,
       lastWatered: lastWatered,
+      age: plant.age,
+      height: plant.height,
+      difficulty: plant.difficulty,
+      lightRequirement: plant.lightRequirement,
+      plantType: plant.plantType,
+      toxicToAnimals: plant.toxicToAnimals,
+      notes: plant.notes,
+      wateringHistory: wateringHistory,
     );
   }
   
@@ -47,6 +58,7 @@ class PlantStatus {
     return PlantStatus(
       plant: data.toPlant(),
       lastWatered: data.lastWatered,
+      wateringHistory: data.wateringHistory,
     );
   }
 }
@@ -119,6 +131,13 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   void _waterPlant(int index) {
     setState(() {
       _plants[index].lastWatered = DateTime.now();
+      _plants[index].wateringHistory.add(DateTime.now());
+      // Keep only last 10 waterings
+      if (_plants[index].wateringHistory.length > 10) {
+        _plants[index].wateringHistory = _plants[index].wateringHistory.sublist(
+          _plants[index].wateringHistory.length - 10
+        );
+      }
     });
     
     _savePlants();
@@ -509,13 +528,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      plantStatus.plant.name,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.textDark,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            plantStatus.plant.name,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.textDark,
+                            ),
+                          ),
+                        ),
+                        _buildDifficultyBadge(plantStatus.plant.difficulty),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -555,6 +581,37 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                   ),
                 ],
               ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Plant info icons
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              _buildInfoChip(
+                icon: Icons.height,
+                label: '${plantStatus.plant.height} cm',
+                color: Colors.blue,
+              ),
+              _buildInfoChip(
+                icon: Icons.cake,
+                label: '${plantStatus.plant.age} ${plantStatus.plant.age == 1 ? "rok" : plantStatus.plant.age < 5 ? "lata" : "lat"}',
+                color: Colors.purple,
+              ),
+              _buildInfoChip(
+                icon: _getLightIcon(plantStatus.plant.lightRequirement),
+                label: _getLightLabel(plantStatus.plant.lightRequirement),
+                color: Colors.orange,
+              ),
+              if (plantStatus.plant.toxicToAnimals)
+                _buildInfoChip(
+                  icon: Icons.pets,
+                  label: 'Toksyczna',
+                  color: Colors.red,
+                ),
             ],
           ),
           
@@ -643,5 +700,96 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         ],
       ),
     );
+  }
+  
+  Widget _buildDifficultyBadge(DifficultyLevel difficulty) {
+    Color color;
+    String label;
+    
+    switch (difficulty) {
+      case DifficultyLevel.latwy:
+        color = Colors.green;
+        label = 'Łatwy';
+        break;
+      case DifficultyLevel.sredni:
+        color = Colors.orange;
+        label = 'Średni';
+        break;
+      case DifficultyLevel.trudny:
+        color = Colors.red;
+        label = 'Trudny';
+        break;
+    }
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: color,
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildInfoChip({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color.withOpacity(0.9),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  IconData _getLightIcon(LightRequirement requirement) {
+    switch (requirement) {
+      case LightRequirement.pelneSlonce:
+        return Icons.wb_sunny;
+      case LightRequirement.polcien:
+        return Icons.wb_cloudy;
+      case LightRequirement.cien:
+        return Icons.nightlight;
+    }
+  }
+  
+  String _getLightLabel(LightRequirement requirement) {
+    switch (requirement) {
+      case LightRequirement.pelneSlonce:
+        return 'Słońce';
+      case LightRequirement.polcien:
+        return 'Półcień';
+      case LightRequirement.cien:
+        return 'Cień';
+    }
   }
 }
