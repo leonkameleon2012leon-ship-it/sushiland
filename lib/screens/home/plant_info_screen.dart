@@ -100,6 +100,16 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> with SingleTickerProv
     }
   }
   
+  String _getAgePluralization(int age) {
+    if (age == 1) {
+      return 'rok';
+    } else if (age < 5) {
+      return 'lata';
+    } else {
+      return 'lat';
+    }
+  }
+  
   void _editPlant() async {
     final result = await Navigator.of(context).push(
       PageRouteBuilder(
@@ -305,7 +315,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> with SingleTickerProv
                               _buildDetailRow(
                                 icon: Icons.cake,
                                 label: 'Wiek',
-                                value: '${widget.plant.age} ${widget.plant.age == 1 ? "rok" : widget.plant.age < 5 ? "lata" : "lat"}',
+                                value: '${widget.plant.age} ${_getAgePluralization(widget.plant.age)}',
                                 color: Colors.purple,
                               ),
                               const Divider(height: 24),

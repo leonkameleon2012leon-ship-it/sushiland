@@ -79,6 +79,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> with TickerProviderStateMixin {
+  static const int _maxWateringHistoryCount = 10;
+  
   late List<PlantStatus> _plants;
   String _userName = '';
   late AnimationController _greetingAnimationController;
@@ -133,10 +135,10 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     setState(() {
       _plants[index].lastWatered = DateTime.now();
       _plants[index].wateringHistory.add(DateTime.now());
-      // Keep only last 10 waterings
-      if (_plants[index].wateringHistory.length > 10) {
+      // Keep only last waterings
+      if (_plants[index].wateringHistory.length > _maxWateringHistoryCount) {
         _plants[index].wateringHistory = _plants[index].wateringHistory.sublist(
-          _plants[index].wateringHistory.length - 10
+          _plants[index].wateringHistory.length - _maxWateringHistoryCount
         );
       }
     });
@@ -250,6 +252,16 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       return 'Witaj';
     } else {
       return 'Dobry wieczór';
+    }
+  }
+  
+  String _getAgePluralization(int age) {
+    if (age == 1) {
+      return 'rok';
+    } else if (age < 5) {
+      return 'lata';
+    } else {
+      return 'lat';
     }
   }
   
@@ -641,7 +653,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               ),
               _buildInfoChip(
                 icon: Icons.cake,
-                label: '${plantStatus.plant.age} ${plantStatus.plant.age == 1 ? "rok" : plantStatus.plant.age < 5 ? "lata" : "lat"}',
+                label: '${plantStatus.plant.age} ${_getAgePluralization(plantStatus.plant.age)}',
                 color: Colors.purple,
               ),
               _buildInfoChip(

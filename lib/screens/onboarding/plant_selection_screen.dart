@@ -364,7 +364,7 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
     });
   }
   
-  void _togglePlant(int index) async {
+  void _selectPlantAndNavigateToDetails(int index) async {
     final plant = availablePlants[index];
     
     // Navigate to details screen
@@ -528,7 +528,7 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 12.0),
-                        child: _buildPlantCard(plant, isSelected, () => _togglePlant(originalIndex)),
+                        child: _buildPlantCard(plant, isSelected, () => _selectPlantAndNavigateToDetails(originalIndex)),
                       ),
                     );
                   },
