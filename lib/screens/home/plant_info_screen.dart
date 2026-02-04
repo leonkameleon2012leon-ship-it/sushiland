@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_theme.dart';
+import '../../utils/plant_helpers.dart';
 import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/plant_details_screen.dart';
 import '../../services/plant_storage_service.dart';
@@ -97,16 +98,6 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> with SingleTickerProv
         return Colors.orange;
       case DifficultyLevel.trudny:
         return Colors.red;
-    }
-  }
-  
-  String _getAgePluralization(int age) {
-    if (age == 1) {
-      return 'rok';
-    } else if (age < 5) {
-      return 'lata';
-    } else {
-      return 'lat';
     }
   }
   
@@ -315,7 +306,7 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> with SingleTickerProv
                               _buildDetailRow(
                                 icon: Icons.cake,
                                 label: 'Wiek',
-                                value: '${widget.plant.age} ${_getAgePluralization(widget.plant.age)}',
+                                value: '${widget.plant.age} ${getAgePluralization(widget.plant.age)}',
                                 color: Colors.purple,
                               ),
                               const Divider(height: 24),

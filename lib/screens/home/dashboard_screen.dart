@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 import '../../constants/app_theme.dart';
 import '../../services/plant_storage_service.dart';
+import '../../utils/plant_helpers.dart';
 import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/welcome_screen.dart';
 import 'plant_info_screen.dart';
@@ -135,12 +136,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     setState(() {
       _plants[index].lastWatered = DateTime.now();
       _plants[index].wateringHistory.add(DateTime.now());
-      // Keep only last waterings
-      if (_plants[index].wateringHistory.length > _maxWateringHistoryCount) {
-        _plants[index].wateringHistory = _plants[index].wateringHistory.sublist(
-          _plants[index].wateringHistory.length - _maxWateringHistoryCount
-        );
-      }
+      // Keep only recent waterings
+      _plants[index].wateringHistory = trimWateringHistory(
+        _plants[index].wateringHistory,
+        _maxWateringHistoryCount,
+      );
     });
     
     _savePlants();
@@ -252,16 +252,6 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
       return 'Witaj';
     } else {
       return 'Dobry wieczór';
-    }
-  }
-  
-  String _getAgePluralization(int age) {
-    if (age == 1) {
-      return 'rok';
-    } else if (age < 5) {
-      return 'lata';
-    } else {
-      return 'lat';
     }
   }
   
@@ -653,7 +643,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
               ),
               _buildInfoChip(
                 icon: Icons.cake,
-                label: '${plantStatus.plant.age} ${_getAgePluralization(plantStatus.plant.age)}',
+                label: '${plantStatus.plant.age} ${getAgePluralization(plantStatus.plant.age)}',
                 color: Colors.purple,
               ),
               _buildInfoChip(

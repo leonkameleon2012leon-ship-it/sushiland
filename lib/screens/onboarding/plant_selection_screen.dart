@@ -325,7 +325,7 @@ class PlantSelectionScreen extends StatefulWidget {
 class _PlantSelectionScreenState extends State<PlantSelectionScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   final Set<int> _selectedPlants = {};
-  final Map<int, Plant> _selectedPlantsData = {}; // Store plant details
+  final Map<int, Plant> _customizedPlantDetails = {}; // Store customized plant details
   late AnimationController _animationController;
   List<Plant> _filteredPlants = availablePlants;
   
@@ -400,8 +400,8 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
           _selectedPlants.remove(index);
         }
         _selectedPlants.add(index);
-        // Update the plant in temporary storage with details
-        _selectedPlantsData[index] = result;
+        // Update the plant with customized details
+        _customizedPlantDetails[index] = result;
       });
     }
   }
@@ -409,7 +409,7 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
   void _navigateToHome() async {
     // Get selected plants with their details (or defaults if not customized)
     final selectedPlantsList = _selectedPlants.map((i) {
-      return _selectedPlantsData[i] ?? availablePlants[i];
+      return _customizedPlantDetails[i] ?? availablePlants[i];
     }).toList();
     
     // If this is during onboarding, mark it as complete
