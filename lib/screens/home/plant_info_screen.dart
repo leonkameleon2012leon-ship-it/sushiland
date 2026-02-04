@@ -5,6 +5,8 @@ import '../../utils/plant_helpers.dart';
 import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/plant_details_screen.dart';
 import '../../services/plant_storage_service.dart';
+import '../plant/plant_stats_screen.dart';
+import '../plant/plant_health_check_screen.dart';
 
 class PlantInfoScreen extends StatefulWidget {
   final Plant plant;
@@ -504,6 +506,76 @@ class _PlantInfoScreenState extends State<PlantInfoScreen> with SingleTickerProv
                                 }).toList(),
                             ],
                           ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 20),
+                      
+                      // Action buttons
+                      FadeTransition(
+                        opacity: _animationController,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => PlantStatsScreen(
+                                        plant: widget.plant,
+                                        wateringHistory: widget.wateringHistory,
+                                        lastWatered: widget.lastWatered,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  backgroundColor: Colors.blue,
+                                ),
+                                icon: const Icon(Icons.bar_chart, size: 20),
+                                label: const Text(
+                                  'Statystyki',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => PlantHealthCheckScreen(
+                                        plant: widget.plant,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  backgroundColor: Colors.orange,
+                                ),
+                                icon: const Icon(Icons.medical_services, size: 20),
+                                label: const Text(
+                                  'Sprawdź zdrowie',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       
