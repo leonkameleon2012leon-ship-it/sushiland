@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 import '../../constants/app_theme.dart';
+import '../../models/plant.dart';
 import '../../services/plant_storage_service.dart';
 import '../../services/weather_service.dart';
 import '../../services/smart_watering_service.dart';

@@ -1,4 +1,4 @@
-import '../screens/onboarding/plant_selection_screen.dart';
+import '../models/plant.dart';
 import 'weather_service.dart';
 
 class SmartWateringService {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../constants/app_theme.dart';
-import 'plant_selection_screen.dart';
+import '../../models/plant.dart';
 
 class PlantDetailsScreen extends StatefulWidget {
   final Plant selectedPlant;

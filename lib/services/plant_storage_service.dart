@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../screens/onboarding/plant_selection_screen.dart';
+import '../models/plant.dart';
 
 class PlantData {
   final String name;
