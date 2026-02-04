@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_theme.dart';
+import '../../models/plant.dart';
 import '../../utils/plant_helpers.dart';
-import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/plant_details_screen.dart';
 import '../../services/plant_storage_service.dart';
 

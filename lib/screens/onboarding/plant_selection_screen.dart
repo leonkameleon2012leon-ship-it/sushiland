@@ -1,70 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_theme.dart';
+import '../../models/plant.dart';
 import '../../services/plant_storage_service.dart';
 import '../home/dashboard_screen.dart';
+import '../plant/plant_scan_screen.dart';
 import 'plant_details_screen.dart';
-
-enum DifficultyLevel { latwy, sredni, trudny }
-
-enum LightRequirement { pelneSlonce, polcien, cien }
-
-enum PlantType { doniczkowa, wiszaca, sukulentowa, kwitnaca }
-
-class Plant {
-  final String name;
-  final String emoji;
-  final String description;
-  final int wateringDays;
-  final int age; // w latach
-  final int height; // w cm
-  final DifficultyLevel difficulty;
-  final LightRequirement lightRequirement;
-  final PlantType plantType;
-  final bool toxicToAnimals;
-  final String? notes;
-  
-  const Plant({
-    required this.name,
-    required this.emoji,
-    required this.description,
-    required this.wateringDays,
-    this.age = 1,
-    this.height = 30,
-    this.difficulty = DifficultyLevel.latwy,
-    this.lightRequirement = LightRequirement.polcien,
-    this.plantType = PlantType.doniczkowa,
-    this.toxicToAnimals = false,
-    this.notes,
-  });
-  
-  Plant copyWith({
-    String? name,
-    String? emoji,
-    String? description,
-    int? wateringDays,
-    int? age,
-    int? height,
-    DifficultyLevel? difficulty,
-    LightRequirement? lightRequirement,
-    PlantType? plantType,
-    bool? toxicToAnimals,
-    String? notes,
-  }) {
-    return Plant(
-      name: name ?? this.name,
-      emoji: emoji ?? this.emoji,
-      description: description ?? this.description,
-      wateringDays: wateringDays ?? this.wateringDays,
-      age: age ?? this.age,
-      height: height ?? this.height,
-      difficulty: difficulty ?? this.difficulty,
-      lightRequirement: lightRequirement ?? this.lightRequirement,
-      plantType: plantType ?? this.plantType,
-      toxicToAnimals: toxicToAnimals ?? this.toxicToAnimals,
-      notes: notes ?? this.notes,
-    );
-  }
-}
 
 const List<Plant> availablePlants = [
   Plant(
@@ -406,6 +346,54 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
     }
   }
   
+  void _openPlantScanner() async {
+    final result = await Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => const PlantScanScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+          
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+          
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 600),
+      ),
+    );
+    
+    // If a plant name was returned, find and select it
+    if (result != null && result is String) {
+      final plantIndex = availablePlants.indexWhere(
+        (plant) => plant.name.toLowerCase() == result.toLowerCase()
+      );
+      
+      if (plantIndex != -1 && mounted) {
+        setState(() {
+          _selectedPlants.add(plantIndex);
+        });
+        
+        // Scroll to the plant if needed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$result został zaznaczony! 🌿'),
+            backgroundColor: AppTheme.primaryGreen,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    }
+  }
+  
   void _navigateToHome() async {
     // Get selected plants with their details (or defaults if not customized)
     final selectedPlantsList = _selectedPlants.map((i) {
@@ -450,6 +438,13 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundGreen,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openPlantScanner,
+        backgroundColor: AppTheme.primaryGreen,
+        icon: const Icon(Icons.camera_alt),
+        label: const Text('Skanuj'),
+        elevation: 4,
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
