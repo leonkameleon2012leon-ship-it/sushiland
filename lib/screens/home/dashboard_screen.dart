@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 import '../../constants/app_theme.dart';
 import '../../services/plant_storage_service.dart';
+import '../../services/weather_service.dart';
+import '../../services/smart_watering_service.dart';
 import '../../utils/plant_helpers.dart';
 import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/welcome_screen.dart';
@@ -84,6 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   
   late List<PlantStatus> _plants;
   String _userName = '';
+  WeatherData? _weatherData;
   late AnimationController _greetingAnimationController;
   
   @override
@@ -106,6 +109,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     
     _greetingAnimationController.forward();
     _loadUserName();
+    _loadWeather();
     
     // Save plants whenever they're initialized or modified
     if (_plants.isNotEmpty) {
@@ -127,6 +131,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     });
   }
   
+  Future<void> _loadWeather() async {
+    try {
+      final weather = await WeatherService.getCurrentWeather();
+      setState(() {
+        _weatherData = weather;
+      });
+    } catch (e) {
+      // Silently fail, weather is optional
+    }
+  }
+  
   Future<void> _savePlants() async {
     final plantDataList = _plants.map((p) => p.toPlantData()).toList();
     await PlantStorageService.savePlants(plantDataList);
@@ -145,15 +160,27 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     
     _savePlants();
     
+    // Calculate next watering with smart watering if weather data available
+    String message = '${_plants[index].plant.name} podlany! 💧';
+    if (_weatherData != null) {
+      final adjustedDays = SmartWateringService.calculateAdjustedWateringDays(
+        _plants[index].plant,
+        _weatherData!,
+      );
+      if (adjustedDays != _plants[index].plant.wateringDays) {
+        message += '\nNastępne podlewanie dostosowane do pogody: za $adjustedDays dni';
+      }
+    }
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${_plants[index].plant.name} podlany! 💧'),
+        content: Text(message),
         backgroundColor: AppTheme.primaryGreen,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -433,6 +460,13 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 ),
               ),
               
+              // Weather card
+              if (_weatherData != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _buildWeatherCard(),
+                ),
+              
               Expanded(
                 child: _plants.isEmpty
                     ? _buildEmptyState()
@@ -497,6 +531,122 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         ),
       ),
     ),
+    );
+  }
+  
+  Widget _buildWeatherCard() {
+    if (_weatherData == null) return const SizedBox.shrink();
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.primaryGreen,
+            AppTheme.lightGreen,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryGreen.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                SmartWateringService.getWeatherIcon(_weatherData!),
+                style: const TextStyle(fontSize: 48),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${_weatherData!.temperature.toStringAsFixed(0)}°C',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      _weatherData!.description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.water_drop,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${_weatherData!.humidity}%',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.lightbulb,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    SmartWateringService.getWateringAdvice(_weatherData!),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
   
