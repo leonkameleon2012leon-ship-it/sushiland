@@ -6,7 +6,7 @@ Aplikacja do dbania o rośliny domowe z pięknym, uspokajającym interfejsem uż
 
 ## ✨ Funkcje
 
-### Ekrany (5 kompletnych ekranów)
+### Ekrany (7 kompletnych ekranów)
 
 1. **Ekran Powitalny** 
    - Animowane liście delikatnie kołyszące się
@@ -26,27 +26,53 @@ Aplikacja do dbania o rośliny domowe z pięknym, uspokajającym interfejsem uż
    - Status wizualny (zielony gdy przyznane)
 
 4. **Wybór Roślin**
-   - 8 predefiniowanych roślin z emoji
+   - 20 predefiniowanych roślin z emoji
    - Funkcja wyszukiwania
    - Wielokrotny wybór
-   - Animowane checkmarki
+   - Automatyczne przekierowanie do ekranu szczegółów po wyborze
    - Animacje skali przy wyborze
 
-5. **Panel Główny**
+5. **Szczegóły Rośliny** (NOWY)
+   - Formularz z informacjami o roślinie
+   - Pola: wiek (0-100 lat), wysokość (1-500 cm)
+   - Wybór poziomu trudności (Łatwy/Średni/Trudny)
+   - Wybór wymagań świetlnych (Pełne słońce/Półcień/Cień)
+   - Wybór typu rośliny (Doniczkowa/Wisząca/Sukulentowa/Kwitnąca)
+   - Checkbox toksyczności dla zwierząt
+   - Pole na notatki (opcjonalne, max 500 znaków)
+   - Walidacja wszystkich pól
+   - Animacje slide-in
+
+6. **Panel Główny** (ROZSZERZONY)
    - Spersonalizowane powitanie według pory dnia
    - Karty statusu roślin z:
      - Wskaźnikami poziomu wody
      - Dni do następnego podlewania
+     - Badge trudności (kolor: zielony/żółty/czerwony)
+     - Ikony informacyjne: wysokość, wiek, światło
+     - Ostrzeżenie o toksyczności dla zwierząt
      - Przycisk szybkiego podlewania
+     - Możliwość kliknięcia karty do pełnego widoku
    - Stan pusty gdy brak roślin
    - Możliwość dodawania kolejnych roślin
+
+7. **Widok Szczegółów Rośliny** (NOWY - BONUS)
+   - Hero animation z emoji rośliny
+   - Wszystkie szczegóły w czytelnej formie
+   - Sekcja historii podlewania (ostatnie 5 podlewań z datami)
+   - Przycisk "Edytuj" - otwiera formularz edycji
+   - Przycisk "Podlej teraz"
+   - Płynne animacje fade i scale
 
 ### 💾 Persistencja Danych
 
 - **Zapis roślin**: Wszystkie rośliny i daty podlewania są zapisywane lokalnie
+- **Szczegóły roślin**: Wiek, wysokość, trudność, wymagania świetlne, typ, toksyczność, notatki
+- **Historia podlewania**: Ostatnie 10 podlewań każdej rośliny
 - **Zapis onboardingu**: Aplikacja pamięta, czy użytkownik ukończył onboarding
 - **Zapis imienia**: Imię użytkownika jest przechowywane trwale
 - **Automatyczne ładowanie**: Przy ponownym uruchomieniu aplikacja ładuje wszystkie dane
+- **Migracja danych**: Stare dane automatycznie aktualizowane do nowej struktury
 
 ### 🎨 Animacje
 
@@ -79,6 +105,7 @@ dependencies:
   shared_preferences: ^2.2.2
   permission_handler: ^11.0.1
   geolocator: ^10.1.0
+  intl: ^0.18.1
 ```
 
 ## 📱 Konfiguracja Platformy
@@ -98,16 +125,31 @@ Opisy uprawnień w `ios/Runner/Info.plist`:
 - ✅ NSLocationAlwaysUsageDescription
 - ✅ Nazwa wyświetlana: "Twoje Rośliny"
 
-## 🌿 Dostępne Rośliny
+## 🌿 Dostępne Rośliny (20 roślin)
 
-1. **Monstera** 🌿 - Łatwa w pielęgnacji (podlewanie co 7 dni)
-2. **Aloes** 🪴 - Nie wymaga dużo wody (co 14 dni)
-3. **Paproć** 🌱 - Lubi wilgotne środowisko (co 5 dni)
-4. **Kaktus** 🌵 - Bardzo wytrzymały (co 21 dni)
-5. **Storczyk** 🌺 - Piękne kwiaty (co 10 dni)
-6. **Filodendron** 🍃 - Duże zielone liście (co 7 dni)
-7. **Sansewieria** 🌿 - Bardzo odporna (co 14 dni)
-8. **Pothos** 🌱 - Oczyszcza powietrze (co 7 dni)
+### Oryginalne rośliny:
+1. **Monstera** 🌿 - Łatwa w pielęgnacji, doniczkowa (podlewanie co 7 dni, toksyczna dla zwierząt)
+2. **Aloes** 🪴 - Sukulentowa, pełne słońce (co 14 dni)
+3. **Paproć** 🌱 - Wisząca, lubi cień (co 5 dni)
+4. **Kaktus** 🌵 - Sukulentowa, bardzo wytrzymały (co 21 dni)
+5. **Storczyk** 🌺 - Kwitnąca, trudna w pielęgnacji (co 10 dni)
+6. **Filodendron** 🍃 - Doniczkowa, duże liście (co 7 dni, toksyczna dla zwierząt)
+7. **Sansewieria** 🌿 - Doniczkowa, bardzo odporna (co 14 dni)
+8. **Pothos** 🌱 - Wisząca, oczyszcza powietrze (co 7 dni, toksyczna dla zwierząt)
+
+### Nowe rośliny:
+9. **Palma Areka** 🌴 - Doniczkowa, tropikalna elegancja (co 7 dni)
+10. **Begonia** 🌸 - Kwitnąca, kolorowe kwiaty (co 5 dni, toksyczna dla zwierząt)
+11. **Koniczyna szczęścia** 🍀 - Doniczkowa, przynosi szczęście (co 7 dni)
+12. **Sukulenty mix** 🌵 - Sukulentowa, różnorodność form (co 14 dni)
+13. **Hibiskus** 🌺 - Kwitnąca, egzotyczne kwiaty (co 5 dni)
+14. **Zamiokulkas** 🪴 - Doniczkowa, niezniszczalny (co 14 dni, toksyczna dla zwierząt)
+15. **Skrzydłokwiat** 🌿 - Kwitnąca, białe kwiaty (co 7 dni, toksyczna dla zwierząt)
+16. **Bazylka** 🌱 - Doniczkowa, aromatyczne zioło (co 3 dni)
+17. **Tulipan** 🌷 - Kwitnąca, wiosenne kwiaty (co 5 dni, toksyczna dla zwierząt)
+18. **Róża miniaturowa** 🌹 - Kwitnąca, małe piękne róże (co 5 dni)
+19. **Dracena** 🍃 - Doniczkowa, kolorowe liście (co 7 dni, toksyczna dla zwierząt)
+20. **Trawa ozdobna** 🌾 - Doniczkowa, subtelna elegancja (co 7 dni)
 
 ## 🚀 Instalacja i Uruchomienie
 
@@ -171,9 +213,11 @@ lib/
 │   │   ├── welcome_screen.dart     # Ekran powitalny z animacjami
 │   │   ├── name_screen.dart        # Wprowadzanie imienia
 │   │   ├── permissions_screen.dart # Prośby o uprawnienia
-│   │   └── plant_selection_screen.dart # Wybór roślin
+│   │   ├── plant_selection_screen.dart # Wybór roślin (20 opcji)
+│   │   └── plant_details_screen.dart   # Formularz szczegółów rośliny (NOWY)
 │   └── home/
-│       └── dashboard_screen.dart   # Główny panel z roślinami
+│       ├── dashboard_screen.dart   # Główny panel z roślinami
+│       └── plant_info_screen.dart  # Widok szczegółów rośliny (NOWY)
 └── main.dart                       # Punkt wejścia aplikacji
 ```
 
@@ -269,6 +313,12 @@ const List<Plant> availablePlants = [
     emoji: '🌸',
     description: 'Opis rośliny',
     wateringDays: 7,
+    age: 2,
+    height: 30,
+    difficulty: DifficultyLevel.latwy,
+    lightRequirement: LightRequirement.polcien,
+    plantType: PlantType.doniczkowa,
+    toxicToAnimals: false,
   ),
 ];
 ```
