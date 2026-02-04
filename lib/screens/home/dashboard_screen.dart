@@ -488,6 +488,8 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 _plants.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
+                        // Using shrinkWrap to render all plants within the scrollable parent.
+                        // This is acceptable since users typically have a small number of plants (5-20).
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(horizontal: 24),
