@@ -5,6 +5,7 @@ import '../../constants/app_theme.dart';
 import '../../services/plant_storage_service.dart';
 import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/welcome_screen.dart';
+import 'plant_info_screen.dart';
 
 class PlantStatus {
   final Plant plant;
@@ -252,6 +253,46 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     }
   }
   
+  void _viewPlantDetails(int index) async {
+    await Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => PlantInfoScreen(
+          plant: _plants[index].plant,
+          lastWatered: _plants[index].lastWatered,
+          wateringHistory: _plants[index].wateringHistory,
+          onPlantUpdated: (updatedPlant) {
+            setState(() {
+              _plants[index] = PlantStatus(
+                plant: updatedPlant,
+                lastWatered: _plants[index].lastWatered,
+                wateringHistory: _plants[index].wateringHistory,
+              );
+            });
+            _savePlants();
+          },
+          onWaterNow: () => _waterPlant(index),
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          const curve = Curves.easeInOut;
+          
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          var offsetAnimation = animation.drive(tween);
+          
+          return SlideTransition(
+            position: offsetAnimation,
+            child: FadeTransition(
+              opacity: animation,
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 600),
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -490,20 +531,22 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   Widget _buildPlantCard(PlantStatus plantStatus, int index) {
     final needsWater = plantStatus.needsWater;
     
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryGreen.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
+    return GestureDetector(
+      onTap: () => _viewPlantDetails(index),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryGreen.withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -699,6 +742,7 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
             ),
         ],
       ),
+    ),
     );
   }
   
