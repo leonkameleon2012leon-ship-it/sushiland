@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
 import '../../constants/app_theme.dart';
+import '../../services/plant_storage_service.dart';
 import '../onboarding/plant_selection_screen.dart';
 
 class PlantStatus {
@@ -30,14 +31,33 @@ class PlantStatus {
       return 'Wszystko w porządku 😊';
     }
   }
+  
+  PlantData toPlantData() {
+    return PlantData(
+      name: plant.name,
+      emoji: plant.emoji,
+      description: plant.description,
+      wateringDays: plant.wateringDays,
+      lastWatered: lastWatered,
+    );
+  }
+  
+  factory PlantStatus.fromPlantData(PlantData data) {
+    return PlantStatus(
+      plant: data.toPlant(),
+      lastWatered: data.lastWatered,
+    );
+  }
 }
 
 class DashboardScreen extends StatefulWidget {
-  final List<Plant> initialPlants;
+  final List<Plant>? initialPlants;
+  final List<PlantData>? savedPlants;
   
   const DashboardScreen({
     Key? key,
-    this.initialPlants = const [],
+    this.initialPlants,
+    this.savedPlants,
   }) : super(key: key);
 
   @override
@@ -53,7 +73,14 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
   void initState() {
     super.initState();
     
-    _plants = widget.initialPlants.map((plant) => PlantStatus(plant: plant)).toList();
+    // Load plants from either saved data or initial plants
+    if (widget.savedPlants != null && widget.savedPlants!.isNotEmpty) {
+      _plants = widget.savedPlants!.map((data) => PlantStatus.fromPlantData(data)).toList();
+    } else if (widget.initialPlants != null && widget.initialPlants!.isNotEmpty) {
+      _plants = widget.initialPlants!.map((plant) => PlantStatus(plant: plant)).toList();
+    } else {
+      _plants = [];
+    }
     
     _greetingAnimationController = AnimationController(
       vsync: this,
@@ -62,6 +89,11 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     
     _greetingAnimationController.forward();
     _loadUserName();
+    
+    // Save plants whenever they're initialized or modified
+    if (_plants.isNotEmpty) {
+      _savePlants();
+    }
   }
   
   @override
@@ -78,10 +110,17 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     });
   }
   
+  Future<void> _savePlants() async {
+    final plantDataList = _plants.map((p) => p.toPlantData()).toList();
+    await PlantStorageService.savePlants(plantDataList);
+  }
+  
   void _waterPlant(int index) {
     setState(() {
       _plants[index].lastWatered = DateTime.now();
     });
+    
+    _savePlants();
     
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -96,10 +135,12 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
     );
   }
   
-  void _addPlant() {
-    Navigator.of(context).push(
+  Future<void> _addPlant() async {
+    final result = await Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const PlantSelectionScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) => const PlantSelectionScreen(
+          isAddingPlants: true,
+        ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(0.0, 1.0);
           const end = Offset.zero;
@@ -116,6 +157,20 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
         transitionDuration: const Duration(milliseconds: 600),
       ),
     );
+    
+    // If plants were added, update the list
+    if (result != null && result is List<Plant>) {
+      setState(() {
+        for (final plant in result) {
+          // Check if plant already exists
+          final exists = _plants.any((p) => p.plant.name == plant.name);
+          if (!exists) {
+            _plants.add(PlantStatus(plant: plant));
+          }
+        }
+      });
+      _savePlants();
+    }
   }
   
   String _getGreeting() {

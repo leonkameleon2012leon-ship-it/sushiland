@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_theme.dart';
+import '../../services/plant_storage_service.dart';
 import '../home/dashboard_screen.dart';
 
 class Plant {
@@ -28,7 +29,12 @@ const List<Plant> availablePlants = [
 ];
 
 class PlantSelectionScreen extends StatefulWidget {
-  const PlantSelectionScreen({Key? key}) : super(key: key);
+  final bool isAddingPlants;
+  
+  const PlantSelectionScreen({
+    Key? key,
+    this.isAddingPlants = false,
+  }) : super(key: key);
 
   @override
   State<PlantSelectionScreen> createState() => _PlantSelectionScreenState();
@@ -85,33 +91,41 @@ class _PlantSelectionScreenState extends State<PlantSelectionScreen> with Single
     });
   }
   
-  void _navigateToHome() {
+  void _navigateToHome() async {
     final selectedPlantsList = _selectedPlants.map((i) => availablePlants[i]).toList();
     
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => DashboardScreen(
-          initialPlants: selectedPlantsList,
+    // If this is during onboarding, mark it as complete
+    if (!widget.isAddingPlants) {
+      await PlantStorageService.setOnboardingComplete(true);
+      
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => DashboardScreen(
+            initialPlants: selectedPlantsList,
+          ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOut;
+            
+            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            var offsetAnimation = animation.drive(tween);
+            
+            return SlideTransition(
+              position: offsetAnimation,
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 600),
         ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          const begin = Offset(1.0, 0.0);
-          const end = Offset.zero;
-          const curve = Curves.easeInOut;
-          
-          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-          var offsetAnimation = animation.drive(tween);
-          
-          return SlideTransition(
-            position: offsetAnimation,
-            child: FadeTransition(
-              opacity: animation,
-              child: child,
-            ),
-          );
-        },
-        transitionDuration: const Duration(milliseconds: 600),
-      ),
-    );
+      );
+    } else {
+      // If adding plants from dashboard, just return the list
+      Navigator.of(context).pop(selectedPlantsList);
+    }
   }
   
   @override
