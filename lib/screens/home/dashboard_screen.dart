@@ -8,6 +8,7 @@ import '../../services/smart_watering_service.dart';
 import '../../utils/plant_helpers.dart';
 import '../onboarding/plant_selection_screen.dart';
 import '../onboarding/welcome_screen.dart';
+import '../plant/plant_health_screen.dart';
 import 'plant_info_screen.dart';
 
 class PlantStatus {
@@ -500,6 +501,38 @@ class _DashboardScreenState extends State<DashboardScreen> with TickerProviderSt
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
+                    // Health check button
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const PlantHealthScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        minimumSize: const Size(double.infinity, 56),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.medical_services),
+                          SizedBox(width: 8),
+                          Text(
+                            'Sprawdź zdrowie rośliny',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     ElevatedButton(
                       onPressed: _addPlant,
                       style: ElevatedButton.styleFrom(
